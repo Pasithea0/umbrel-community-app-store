@@ -1,0 +1,68 @@
+manifestVersion: 1.1
+id: pasithea-torbox
+storage:
+  dataRoot: data
+category: networking
+name: TorBox Client
+version: "0.1.0"
+tagline: Use TorBox as the download client for Sonarr and Radarr
+description: >-
+  TorBox Client lets Sonarr and Radarr use your TorBox account as their download
+  client. It speaks the qBittorrent API, so the *arr apps treat it exactly like
+  a local torrent client: they hand it a magnet or .torrent file, TorBox does
+  the downloading in the cloud, and the finished files are pulled down into the
+  shared downloads folder where Sonarr and Radarr import them normally.
+
+
+  Because the transfer, seeding and bandwidth all happen on TorBox's side, this
+  Umbrel only ever stores the files you actually keep. Completed torrents are
+  reported as already having satisfied their seeding requirement, which is what
+  lets Sonarr and Radarr's "Remove Completed Downloads" setting fire and reclaim
+  the space straight after import.
+
+
+  🛠️ SETUP INSTRUCTIONS
+
+
+  1. Create the API key file, then restart this app from the Umbrel home
+  screen. Run this in the Umbrel terminal (Settings → Advanced Settings →
+  Terminal):
+
+
+  echo 'YOUR_TORBOX_API_KEY' > ~/umbrel/app-data/pasithea-torbox/data/torbox-api-key
+
+
+  The key is read from that file only, so it is never stored in this app store
+  or in the compose file. Get it from https://torbox.app/settings.
+
+
+  2. Open the app and sign in with the username and password shown on this
+  page.
+
+
+  3. In Sonarr and Radarr add a qBittorrent download client: host
+  pasithea-torbox_server_1, port 8080, the same credentials, and SSL off. Use
+  category tv-sonarr in Sonarr and radarr in Radarr.
+
+
+  Mount both apps at /downloads, which is where this app also writes. That
+  shared path is what makes hardlink imports work instead of copying every file
+  twice.
+developer: devblaze
+website: https://github.com/devblaze/torbox-client
+dependencies: []
+repo: https://github.com/devblaze/torbox-client
+support: https://github.com/devblaze/torbox-client/issues
+port: 8484
+gallery: []
+path: ""
+icon: https://raw.githubusercontent.com/devblaze/torbox-client/main/icons/torbox-client.png
+defaultUsername: "admin"
+deterministicPassword: true
+releaseNotes: >-
+  Initial release.
+torOnly: false
+permissions:
+  - STORAGE_DOWNLOADS
+submitter: Pasithea0
+submission: https://github.com/Pasithea0/umbrel-community-app-store

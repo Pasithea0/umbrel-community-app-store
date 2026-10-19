@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: pasithea-torbox_server_1
+      APP_PORT: 8080
+      # No PROXY_AUTH_WHITELIST on purpose. Sonarr and Radarr reach the
+      # qBittorrent-compatible API container-to-container over Umbrel's app
+      # network, which bypasses app_proxy entirely, so no path here needs to
+      # skip umbrelOS login. Every request from the LAN stays authenticated.
+
+  server:
+    # Upstream publishes :latest only (no release tags), so the digest is what
+    # actually pins the build. scripts/update-torbox.sh re-pins it.
+    image: ghcr.io/devblaze/torbox-client:latest@sha256:9f5aaa5283018ad44bd73ff619073a3433714a5fda428d8c1255efdad8e9559d
+    restart: on-failure
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      # Both paths must resolve to the same files on disk as they do inside
+      # Sonarr and Radarr, otherwise imports fail with "file not found" and
+      # hardlinks silently become full copies.
+      - DOWNLOAD_DIR=/downloads
+      - SAVE_PATH=/downloads
+      - DATA_DIR=/data
+      - LISTEN_PORT=8080
+      # Upstream reads this from the environment only; exports.sh fills it from
+      # a file the user creates, so no secret is committed to this repository.
+      - TORBOX_API_KEY=${APP_PASITHEA_TORBOX_API_KEY:-}
+      # APP_PASSWORD is Umbrel's per-install derived secret. deterministicPassword
+      # in the manifest lets umbrelOS show it to the user, who needs it both for
+      # this app's own login screen and to fill in Sonarr and Radarr.
+      - QBIT_USER=admin
+      - QBIT_PASS=${APP_PASSWORD}
+    volumes:
+      - ${UMBREL_ROOT}/data/storage/downloads:/downloads
+      - ${APP_DATA_DIR}/data/torbox:/data
