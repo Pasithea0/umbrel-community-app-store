@@ -1,0 +1,63 @@
+name: Update TorBox Client
+
+# Keeps the packaged TorBox Client pinned to whatever build upstream is serving,
+# so the app store does not need manual upkeep. Upstream only publishes the
+# `latest` tag, so without this the digest pin would silently rot.
+#
+# Deliberately not triggered by push: the job commits to this repository, and a
+# push trigger would make it re-run against its own commit.
+
+on:
+  schedule:
+    # Upstream builds on every push to main, so a daily check is enough. The
+    # offset avoids the top-of-hour rush on GitHub's scheduler and keeps it away
+    # from the Silo job.
+    - cron: "47 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-torbox
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Repin TorBox Client and commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install lint dependencies
+        run: npm install --no-audit --no-fund
+
+      # The update script falls back to `docker buildx imagetools inspect`, which
+      # the ubuntu-latest runner already has, so no extra tooling is needed.
+      - name: Repin to the current upstream image
+        run: ./scripts/update-torbox.sh
+
+      - name: Lint the package before committing
+        run: npm run lint:apps -- pasithea-torbox --check-images
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          # Scope the commit to the app package; the repin script only ever
+          # writes those two files.
+          if git diff --quiet -- pasithea-torbox; then
+            echo "Nothing to commit - the package is already current."
+            exit 0
+          fi
+          version="$(sed -nE 's/^version: *"?([^"]*)"? *$/\1/p' pasithea-torbox/umbrel-app.yml | head -1)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pasithea-torbox
+          git commit -m "chore(torbox): update package to ${version}"
+          git push
