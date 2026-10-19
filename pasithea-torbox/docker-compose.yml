@@ -29,11 +29,19 @@ services:
       # Upstream reads this from the environment only; exports.sh fills it from
       # a file the user creates, so no secret is committed to this repository.
       - TORBOX_API_KEY=${APP_PASITHEA_TORBOX_API_KEY:-}
-      # APP_PASSWORD is Umbrel's per-install derived secret. deterministicPassword
-      # in the manifest lets umbrelOS show it to the user, who needs it both for
-      # this app's own login screen and to fill in Sonarr and Radarr.
+      # A fixed local credential, declared in the manifest as defaultPassword so
+      # umbrelOS can show it and so Sonarr/Radarr can be configured without the
+      # user transcribing anything.
+      #
+      # This is deliberately not a derived secret. The user needs the value in
+      # two other apps, and a 64-character HMAC that has to be retyped by hand
+      # into four form fields is a support burden, not a security win. What it
+      # actually protects is a qBittorrent-shaped API reachable only from
+      # Umbrel's app network: app_proxy whitelists nothing, so no path from the
+      # LAN reaches it. It is not upstream's documented default either, so
+      # nothing that scans for the stock value gets in.
       - QBIT_USER=admin
-      - QBIT_PASS=${APP_PASSWORD}
+      - QBIT_PASS=torboxclient
     volumes:
       - ${UMBREL_ROOT}/data/storage/downloads:/downloads
       - ${APP_DATA_DIR}/data/torbox:/data

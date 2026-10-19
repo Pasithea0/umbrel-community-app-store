@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: networking
 name: TorBox Client
-version: "0.1.0"
+version: "0.1.1"
 tagline: Use TorBox as the download client for Sonarr and Radarr
 description: >-
   TorBox Client lets Sonarr and Radarr use your TorBox account as their download
@@ -58,9 +58,11 @@ gallery: []
 path: ""
 icon: https://raw.githubusercontent.com/devblaze/torbox-client/main/icons/torbox-client.png
 defaultUsername: "admin"
-deterministicPassword: true
+defaultPassword: "torboxclient"
 releaseNotes: >-
-  Initial release.
+  Fixed the Sonarr and Radarr login. The qBittorrent client credentials are now
+  admin / torboxclient, shown on this page, instead of a generated password that
+  had to be read from here and retyped into Sonarr and Radarr.
 torOnly: false
 permissions:
   - STORAGE_DOWNLOADS
