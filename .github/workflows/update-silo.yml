@@ -1,0 +1,63 @@
+name: Update Silo
+
+# Keeps the packaged Silo pinned to the newest silo-server main commit, so the
+# app store does not need manual upkeep when upstream ships.
+#
+# Deliberately not triggered by push: the job commits to this repository, and a
+# push trigger would make it re-run against its own commit.
+
+on:
+  schedule:
+    # Upstream builds from main continuously, so a daily check is enough. The
+    # offset avoids the top-of-hour rush on GitHub's scheduler.
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-silo
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Repin Silo and commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install lint dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Repin to the newest upstream commit
+        env:
+          # Only used to raise the GitHub API rate limit when resolving the
+          # upstream head commit. The image digests come from the registries.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/update-silo.sh
+
+      - name: Lint the package before committing
+        run: npm run lint:apps -- pasithea-silo --check-images
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          # Scope the commit to the app package; the repin script only ever
+          # writes those two files.
+          if git diff --quiet -- pasithea-silo; then
+            echo "Nothing to commit - the package is already current."
+            exit 0
+          fi
+          version="$(sed -nE 's/^version: *"?([^"]*)"? *$/\1/p' pasithea-silo/umbrel-app.yml | head -1)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pasithea-silo
+          git commit -m "chore(silo): update package to ${version}"
+          git push
