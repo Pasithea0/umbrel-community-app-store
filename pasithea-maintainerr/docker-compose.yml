@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: pasithea-maintainerr_server_1
+      APP_PORT: 6246
+      # No PROXY_AUTH_WHITELIST on purpose. Maintainerr ships without a login of
+      # its own, so every request arriving from the LAN must keep hitting
+      # umbrelOS auth. Nothing external needs to reach it: Sonarr, Radarr and the
+      # media server are called *by* Maintainerr, and their own callbacks happen
+      # container-to-container, which bypasses app_proxy entirely.
+
+  server:
+    # Upstream publishes real release tags (3.30.2), so the tag is meaningful and
+    # the digest pins the exact build behind it. Note the tag has no "v" prefix:
+    # v3.30.2 does not exist and 404s.
+    image: ghcr.io/maintainerr/maintainerr:3.30.2@sha256:816779316fc9a2d8e45946dc7a0e676784bc1453eaaff701900132ab67d5abba
+    restart: on-failure
+    environment:
+      # Upstream's own docker run example sets TZ explicitly, and the rules are
+      # date-driven ("added more than 30 days ago"), so a wrong clock silently
+      # changes what gets deleted. Fall back to UTC rather than leaving it unset.
+      - TZ=${TZ:-Etc/UTC}
+      # Already the image default (ENV DATA_DIR=/opt/data); restated so the value
+      # and the volume below cannot drift apart.
+      - DATA_DIR=/opt/data
+    volumes:
+      # Config and the SQLite database. Upstream warns the directory must be
+      # writable by the container user, which is `node` (uid/gid 1000) - the same
+      # uid umbrelOS owns app data with, so the bind mount lines up as-is.
+      #
+      # Deliberately no mount of the Downloads storage: Maintainerr deletes
+      # through the Sonarr/Radarr APIs, which already own those files, so it
+      # never needs to touch the filesystem itself.
+      - ${APP_DATA_DIR}/data/maintainerr:/opt/data

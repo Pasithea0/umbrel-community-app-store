@@ -41,6 +41,29 @@ Secrets (`SECRET_KEY`, the PostgreSQL password) are derived from Umbrel's device
 seed by `pasithea-silo/exports.sh`, so they are stable across restarts and
 updates and never stored in this repository.
 
+### TorBox Client
+
+Speaks the qBittorrent API so Sonarr and Radarr can use a TorBox account as their
+download client. TorBox does the transfer, seeding and bandwidth in the cloud;
+this box only stores the files you keep. The API key is read from a file the user
+writes (`~/umbrel/app-data/pasithea-torbox/data/torbox-api-key`), never from this
+repository.
+
+- Upstream: <https://github.com/devblaze/torbox-client>
+
+### Maintainerr
+
+Removes watched media on a schedule so the library does not fill the disk. Rules
+match on watch state, age, size and language; matches collect into a collection
+with a countdown, then deletions are handed to Sonarr and Radarr so those apps
+stay consistent about what they hold.
+
+- Upstream: <https://maintainerr.info> · <https://github.com/maintainerr/maintainerr>
+
+No `STORAGE_DOWNLOADS` mount: Maintainerr deletes through the *arr APIs rather
+than the filesystem. Pair it with Silo's Jellyfin-compatible listener on **18096**
+for watch state, and with `sonarr_server_1:8989` / `radarr_server_1:7878`.
+
 ## Updates are automatic
 
 `pasithea-silo` is kept current by
@@ -95,12 +118,19 @@ and pull request.
 
 ### Known lint warnings
 
-`npm run lint:apps` reports three `access.host_mount` warnings for
-`/proc/meminfo`, `/proc/stat`, and `/proc/loadavg`. These are intentional.
-Upstream mounts them so Silo reports its own CPU, load, and memory rather than
-the physical machine's, which matters when the Docker host is itself an LXC
-container. They are read-only single-file mounts, and on bare metal or a VM they
-are the same files Silo would read anyway.
+`npm run lint:apps` reports four warnings, all intentional.
+
+Three are `access.host_mount` warnings on `pasithea-silo` for `/proc/meminfo`,
+`/proc/stat`, and `/proc/loadavg`. Upstream mounts them so Silo reports its own
+CPU, load, and memory rather than the physical machine's, which matters when the
+Docker host is itself an LXC container. They are read-only single-file mounts,
+and on bare metal or a VM they are the same files Silo would read anyway.
+
+The fourth is an `image.latest` warning on `pasithea-torbox`: upstream publishes
+no release tags at all, only `latest`, so a digest-pinned `latest` is the only
+way to pin that build. `pasithea-silo` never triggers it because its images are
+tagged with the commit they were built from, and `pasithea-maintainerr` publishes
+real release tags and is pinned by version.
 
 ## Layout
 
@@ -111,6 +141,16 @@ pasithea-silo/                the Silo app package
   docker-compose.yml          service definitions
   exports.sh                  derived secrets
   data/                       committed bind-mount sources
+pasithea-torbox/              the TorBox Client app package
+  umbrel-app.yml
+  docker-compose.yml
+  exports.sh                  reads the API key from a user-written file
+  data/                       committed bind-mount sources
+pasithea-maintainerr/         the Maintainerr app package
+  umbrel-app.yml
+  docker-compose.yml
+  data/                       committed bind-mount sources
 scripts/update-silo.sh        the repin logic the workflow calls
+scripts/update-torbox.sh      the repin logic the workflow calls
 .tools/lint-apps.mjs          vendored Umbrel linter
 ```

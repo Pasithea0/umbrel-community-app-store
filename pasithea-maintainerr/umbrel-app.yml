@@ -1,0 +1,63 @@
+manifestVersion: 1.1
+id: pasithea-maintainerr
+storage:
+  dataRoot: data
+category: media
+name: Maintainerr
+version: "3.30.2"
+tagline: Delete watched media automatically so the library never fills your disk
+description: >-
+  Maintainerr is the janitor your media server doesn't have. Write rules for the
+  things that are only taking up space - never played, played by everyone, added
+  longer ago than N days, bigger than N GB, in a language nobody here watches -
+  and Maintainerr gathers the matches into a collection, gives everyone a grace
+  period to catch up, then clears them from your media server, from Sonarr and
+  Radarr, and from Seerr or Ombi. Set it up once and forget it.
+
+
+  Deletions are handed to Sonarr and Radarr rather than aimed at the filesystem,
+  so the *arr apps stay consistent about what they hold and can immediately
+  re-grab anything you change your mind about.
+
+
+  It is a scheduler, not a script: rules are evaluated on your schedule, matches
+  are collected and shown to you first, and only then are they removed. A
+  mistyped rule costs you a warning, not your library.
+
+
+  🛠️ SETUP INSTRUCTIONS
+
+
+  1. Open the app. This package deliberately leaves your Umbrel login in front of
+  it - Maintainerr ships without a login of its own - so every request from your
+  network stays authenticated. Keep it that way.
+
+
+  2. Add your media server. Maintainerr reads watch state from a Jellyfin, Plex
+  or Emby server, and Silo publishes a Jellyfin-compatible API for exactly this.
+  Use "Jellyfin" as the server type and its internal address,
+  http://pasithea-silo_server_1:8096
+
+
+  3. Add Sonarr and Radarr under the *arr settings. Use their internal addresses
+  - http://sonarr_server_1:8989 and http://radarr_server_1:7878 - with the API
+  key from each app's Settings → General.
+
+
+  4. Write one rule and watch what it collects before letting it delete. The
+  countdown before removal, and the schedule it runs on, are yours to set.
+developer: Maintainerr
+website: https://maintainerr.info
+dependencies: []
+repo: https://github.com/maintainerr/maintainerr
+support: https://github.com/maintainerr/maintainerr/issues
+port: 6246
+gallery: []
+path: ""
+icon: https://raw.githubusercontent.com/maintainerr/maintainerr/development/apps/ui/public/logo.png
+releaseNotes: >-
+  First release, tracking Maintainerr v3.30.2. Pinned by digest, not by tag, so
+  the build cannot change underneath a running install.
+torOnly: false
+submitter: Pasithea0
+submission: https://github.com/Pasithea0/umbrel-community-app-store
