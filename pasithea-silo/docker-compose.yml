@@ -14,7 +14,7 @@ services:
     # Upstream publishes no releases: `latest` and per-commit tags are built from
     # main. This tag is the full commit SHA the image was built from, so the
     # pinned image is traceable. scripts/update-silo.sh keeps it current.
-    image: ghcr.io/silo-server/silo-server:31fabc72398616bf2e5dfbbf7f3361566cd91474@sha256:86c6f7c3b57645206518da5250cb6342e25bf723203477d56b51be934cb82a9d
+    image: ghcr.io/silo-server/silo-server:489fe4d55735f3855b2a0d6276e57d148891b456@sha256:cec6a34eff182d28f5cd11ba05d3b6be1f9bac6284f68900d704873b18cf9298
     restart: on-failure
     # On stop Silo fails readiness, keeps serving for SILO_SHUTDOWN_DELAY (5s by
     # default), then finishes in-flight requests. Docker's default 10s stop
