@@ -12,10 +12,10 @@ services:
       # container-to-container, which bypasses app_proxy entirely.
 
   server:
-    # Upstream publishes real release tags (3.30.2), so the tag is meaningful and
-    # the digest pins the exact build behind it. Note the tag has no "v" prefix:
-    # v3.30.2 does not exist and 404s.
-    image: ghcr.io/maintainerr/maintainerr:3.30.2@sha256:816779316fc9a2d8e45946dc7a0e676784bc1453eaaff701900132ab67d5abba
+    # Upstream publishes real release tags, so the tag is meaningful and the
+    # digest pins the exact build behind it. Note the tag has no "v" prefix:
+    # v3.32.0 does not exist and 404s.
+    image: ghcr.io/maintainerr/maintainerr:3.32.0@sha256:5dcd5bef9d49c614bb74453df3da198afc05a38d8e2cd96b3669bc2c76a94112
     restart: on-failure
     environment:
       # Upstream's own docker run example sets TZ explicitly, and the rules are

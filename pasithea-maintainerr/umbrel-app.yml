@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: media
 name: Maintainerr
-version: "3.30.2"
+version: "3.32.0"
 tagline: Delete watched media automatically so the library never fills your disk
 description: >-
   Maintainerr is the janitor your media server doesn't have. Write rules for the
@@ -55,9 +55,7 @@ port: 6246
 gallery: []
 path: ""
 icon: https://raw.githubusercontent.com/maintainerr/maintainerr/development/apps/ui/public/logo.png
-releaseNotes: >-
-  First release, tracking Maintainerr v3.30.2. Pinned by digest, not by tag, so
-  the build cannot change underneath a running install.
+releaseNotes: "Maintainerr updated to 3.32.0. Upstream release: https://github.com/maintainerr/maintainerr/releases/tag/v3.32.0"
 torOnly: false
 submitter: Pasithea0
 submission: https://github.com/Pasithea0/umbrel-community-app-store
