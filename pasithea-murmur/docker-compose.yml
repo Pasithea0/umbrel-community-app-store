@@ -16,7 +16,7 @@ services:
     # commit the image was built from and the digest pins the multi-arch index,
     # so the image is traceable to its source. scripts/update-murmur.sh keeps it
     # current.
-    image: ghcr.io/pasithea0/murmur:dev-6f695d52e7d217c61336c1fb2a7e4924df1250c5@sha256:55c687239df1f6d8cb162c770f0a94cd04c39a2d791bf6cdc66075f310c89ee4
+    image: ghcr.io/pasithea0/murmur:dev-b1a5e2a917642fe8c94153e18ddf5f6ef81ab182@sha256:d7c8704d37bea6546a8b17a8aeeecc13702e5c64bf5564ce60c05ae94d59d6f8
     user: "1000:1000"
     init: true
     restart: on-failure
