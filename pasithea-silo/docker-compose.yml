@@ -14,7 +14,7 @@ services:
     # Upstream publishes no releases: `latest` and per-commit tags are built from
     # main. This tag is the full commit SHA the image was built from, so the
     # pinned image is traceable. scripts/update-silo.sh keeps it current.
-    image: ghcr.io/silo-server/silo-server:2d5f22e7d704799e3bd456e1517d6e5cee3cfbc5@sha256:cb0a977607f0a0d0e5532827696c22179052b66afe30ce69837e7cbd662c6faa
+    image: ghcr.io/silo-server/silo-server:7b1c3f75242c995d5fadffaf0c9242fe5a4ac5ae@sha256:89097e0971af76add7ca68b0d096fbeeaf90bae01f4220dc474cad59a41663c9
     restart: on-failure
     # On stop Silo fails readiness, keeps serving for SILO_SHUTDOWN_DELAY (5s by
     # default), then finishes in-flight requests. Docker's default 10s stop
@@ -83,7 +83,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:8.2-alpine@sha256:489a769e0a54dc245896132a15c72d2bc7296719954da99398f43a3877e5f8eb
+    image: redis:8.2-alpine@sha256:fe9daae35cd4fd6ec22416aa4fe0cf6b3e36741e06ff45b9986253fe2a81c041
     restart: on-failure
     volumes:
       - ${APP_DATA_DIR}/data/redis:/data
