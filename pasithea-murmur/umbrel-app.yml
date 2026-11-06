@@ -1,0 +1,48 @@
+manifestVersion: 1.1
+id: pasithea-murmur
+storage:
+  dataRoot: data
+category: ai
+name: Murmur (Pasithea)
+version: "6f695d5"
+tagline: Murmur with more than one conversation in a group
+description: >-
+  Murmur is a calm, beautiful home for your Hermes agents: make a few agents,
+  give each one a personality, and talk to them from a browser, a Mac or PC, or
+  a phone.
+
+
+  This is Pasithea's own build of Murmur, made from a branch of a fork of
+  Murmur rather than from a release. Everything the official app does is here;
+  the difference is that a group chat can hold more than one conversation, so
+  starting something new never means making a new group and adding everyone
+  again. Group info lists a group's conversations and starts new ones.
+
+
+  It is the same Murmur in every other way: the same agents, chats, groups,
+  models, apps, routines, WhatsApp and Telegram, and the same Umbrel and Hermes
+  Agent integration. Upstream Murmur is not affiliated with this package; if you
+  want the official app, install Murmur from the Umbrel App Store.
+
+
+  Murmur comes with Hermes built in, so there is nothing else to install, and it
+  finds an existing Hermes Agent app on this Umbrel and offers to use that
+  instead, so your agents and chats stay where they are. Installing both this
+  and the official Murmur is possible; they keep their own data and do not
+  share a login.
+releaseNotes: "Pasithea's Murmur updated to fork commit 6f695d5. Full changes: https://github.com/Pasithea0/murmur/commits/dev"
+developer: Pasithea
+website: https://github.com/Pasithea0/murmur
+dependencies: []
+repo: https://github.com/Pasithea0/murmur
+support: https://github.com/Pasithea0/murmur/issues
+port: 8105
+gallery: []
+path: ""
+icon: https://raw.githubusercontent.com/getumbrel/murmur/master/docs/readme/icon-light.png
+defaultUsername: ""
+defaultPassword: ""
+permissions:
+  - GPU
+submitter: Pasithea0
+submission: https://github.com/Pasithea0/umbrel-community-app-store

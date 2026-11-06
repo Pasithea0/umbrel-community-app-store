@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: pasithea-murmur_web_1
+      APP_PORT: 3000
+      # Umbrel login stays on; only the files a phone fetches without cookies
+      # when Murmur is added to the home screen are let through. The app has no
+      # login of its own, so nothing else may be whitelisted.
+      PROXY_AUTH_WHITELIST: "/manifest.webmanifest,/favicon.svg,/icon.svg,/icon-192.png,/icon-512.png,/icon-maskable-512.png,/apple-touch-icon.png"
+
+  web:
+    # Built from Pasithea0/murmur's `dev` branch by that fork's "Dev image"
+    # workflow, which pushes dev-<short sha> for every commit. The tag names the
+    # commit the image was built from and the digest pins the multi-arch index,
+    # so the image is traceable to its source. scripts/update-murmur.sh keeps it
+    # current.
+    image: ghcr.io/pasithea0/murmur:dev-6f695d52e7d217c61336c1fb2a7e4924df1250c5@sha256:55c687239df1f6d8cb162c770f0a94cd04c39a2d791bf6cdc66075f310c89ee4
+    user: "1000:1000"
+    init: true
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/data/murmur:/data
+    environment:
+      # The Hermes that comes with Murmur (below), and how Murmur signs in to it.
+      MURMUR_BUILTIN_HERMES_URL: "http://pasithea-murmur_hermes_1:9119"
+      MURMUR_BUILTIN_HERMES_USERNAME: "murmur"
+      MURMUR_BUILTIN_HERMES_PASSWORD: ${APP_PASITHEA_MURMUR_HERMES_PASSWORD}
+      # The Hermes Agent app, if it's installed: offered on first run instead,
+      # with the agents and chats already in it.
+      MURMUR_FIND_HERMES: "Hermes Agent=http://hermes-agent_web_1:18789"
+      # Umbrel's login sits in front of Murmur, so it answers to whatever name
+      # or address the Umbrel is reached by (umbrel.local, an IP, a custom domain).
+      MURMUR_ALLOWED_HOSTS: "*"
+
+  # Murmur's own Hermes. Private: never published, never behind app_proxy, and
+  # gated by a username and password only Murmur knows. Its data (and the API
+  # keys in its .env) has its own folder, which Murmur's container can't see.
+  hermes:
+    # The Hermes that Murmur 0.11.1 ships with, the same one the official app
+    # pins. scripts/update-murmur.sh refreshes its digest alongside Murmur's,
+    # since a rebuilt versioned tag is a real update.
+    image: ghcr.io/getumbrel/hermes-agent-umbrel:v0.22.5-4@sha256:dedf680483c8ef4d8d62563f2099dc14e6fd863ffd5ae9bf32ea41b142d318a7
+    restart: on-failure
+    stop_grace_period: 1m
+    volumes:
+      - ${APP_DATA_DIR}/data/hermes:/opt/data
+    environment:
+      HERMES_UID: "1000"
+      HERMES_GID: "1000"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: "murmur"
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${APP_PASITHEA_MURMUR_HERMES_PASSWORD}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${APP_PASITHEA_MURMUR_HERMES_SECRET}
+      # Routines and Telegram run in Hermes's messaging gateway.
+      HERMES_GATEWAY_BOOTSTRAP_STATE: "running"
+      # The app its agents should send people to for files, the terminal and restarts.
+      UMBREL_APP_NAME: "Murmur (Pasithea)"
+    command: ["gateway", "run"]

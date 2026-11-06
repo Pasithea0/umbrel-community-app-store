@@ -64,6 +64,35 @@ No `STORAGE_DOWNLOADS` mount: Maintainerr deletes through the *arr APIs rather
 than the filesystem. Pair it with Silo's Jellyfin-compatible listener on **18096**
 for watch state, and with `sonarr_server_1:8989` / `radarr_server_1:7878`.
 
+### Murmur (Pasithea)
+
+Murmur is a phone-first home for Hermes agents: agents with personalities, one
+or several of them in a chat, apps, routines, memory, WhatsApp and Telegram.
+This package is Pasithea's own build of it — made from a branch of a fork rather
+than from a release — and the one thing it adds is that a **group chat holds
+more than one conversation**: Group info lists a group's conversations and
+starts new ones, so asking something new never means making a new group and
+adding everyone to it again.
+
+Everything else is the same as the official app, including the Hermes it ships
+with (Hermes Agent 0.22.5) and what it does when the Hermes Agent app is already
+installed: it finds it and offers to use that instead, so your agents and chats
+stay where they are. It can be installed beside the official Murmur — the two
+keep their own data and do not share a login.
+
+- Upstream: <https://github.com/getumbrel/murmur>
+- This build: <https://github.com/Pasithea0/murmur> (branch `dev`)
+- Port **8105**; the official app keeps 18793.
+
+The password Murmur signs in to its own Hermes with, and the key that keeps that
+session alive, are derived from Umbrel's device seed by
+`pasithea-murmur/exports.sh`, so neither is in this repository. The `GPU`
+permission is inherited from the official package, where it is what lets the
+bundled Hermes run a model on the Umbrel itself.
+
+If you would rather run upstream's release than this build, install **Murmur**
+from the Umbrel App Store and remove this one.
+
 ## Updates are automatic
 
 `pasithea-silo` is kept current by
@@ -103,14 +132,32 @@ image exists for both architectures, and repins tag and digest together. Manifes
 release is ever rebuilt, the version takes a `-patch.N` suffix so the update is
 still visible.
 
+### Murmur (Pasithea)
+
+`pasithea-murmur` is kept current by
+[`.github/workflows/update-murmur.yml`](.github/workflows/update-murmur.yml),
+daily and on demand, and it follows a fork branch rather than an upstream
+release: `Pasithea0/murmur`'s `dev`. That fork's own
+[Dev image](https://github.com/Pasithea0/murmur/blob/dev/.github/workflows/dev-image.yml)
+workflow builds `ghcr.io/pasithea0/murmur:dev-<commit>` on every push there, so
+the repin step is Silo's: resolve the branch head, wait until GHCR has an image
+for that exact commit covering both architectures, repin tag and digest, and
+refresh the digest of the bundled Hermes image. Manifest `version` is the short
+commit, and the release notes link the commits between it and the last one.
+
+So the loop is: push to `dev` in the fork, let its image build finish, and the
+next daily run puts it in the store. To publish a change immediately, run this
+repository's **Update Murmur** workflow from the Actions tab.
+
 ### Running it yourself
 
 ```sh
 ./scripts/update-silo.sh
 ```
 
-Every app has its own repin script — `scripts/update-torbox.sh` and
-`scripts/update-maintainerr.sh` work the same way, each on its own package. Each
+Every app has its own repin script — `scripts/update-torbox.sh`,
+`scripts/update-maintainerr.sh` and `scripts/update-murmur.sh` work the same way,
+each on its own package. Each
 needs `curl`, `jq`, and either [`crane`](https://github.com/google/go-containerregistry)
 or `docker buildx`. It prints what it found and either repins the package or
 reports that it is already current. It never commits — review `git diff` and
@@ -164,8 +211,14 @@ pasithea-maintainerr/         the Maintainerr app package
   umbrel-app.yml
   docker-compose.yml
   data/                       committed bind-mount sources
+pasithea-murmur/              the Murmur (Pasithea) app package
+  umbrel-app.yml
+  docker-compose.yml
+  exports.sh                  derived secrets
+  data/                       committed bind-mount sources
 scripts/update-silo.sh        the repin logic the workflow calls
 scripts/update-torbox.sh      the repin logic the workflow calls
 scripts/update-maintainerr.sh  the repin logic the workflow calls
+scripts/update-murmur.sh      the repin logic the workflow calls
 .tools/lint-apps.mjs          vendored Umbrel linter
 ```
