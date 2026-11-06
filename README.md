@@ -91,13 +91,27 @@ To update a user's install, umbrelOS needs the app-store manifest to change; the
 update then lands the next time they check for app updates. Nothing needs to be
 done by hand.
 
+### Maintainerr
+
+`pasithea-maintainerr` is kept current by
+[`.github/workflows/update-maintainerr.yml`](.github/workflows/update-maintainerr.yml),
+also daily. Maintainerr does publish releases, so this one reads the newest
+non-prerelease release from the GitHub API and maps its `v`-prefixed git tag to
+the unprefixed tag GHCR publishes (`v3.32.0` becomes `3.32.0`), checks that the
+image exists for both architectures, and repins tag and digest together. Manifest
+`version` follows the release, so the update is offered the usual way. If the same
+release is ever rebuilt, the version takes a `-patch.N` suffix so the update is
+still visible.
+
 ### Running it yourself
 
 ```sh
 ./scripts/update-silo.sh
 ```
 
-It needs `curl`, `jq`, and either [`crane`](https://github.com/google/go-containerregistry)
+Every app has its own repin script — `scripts/update-torbox.sh` and
+`scripts/update-maintainerr.sh` work the same way, each on its own package. Each
+needs `curl`, `jq`, and either [`crane`](https://github.com/google/go-containerregistry)
 or `docker buildx`. It prints what it found and either repins the package or
 reports that it is already current. It never commits — review `git diff` and
 commit yourself.
@@ -152,5 +166,6 @@ pasithea-maintainerr/         the Maintainerr app package
   data/                       committed bind-mount sources
 scripts/update-silo.sh        the repin logic the workflow calls
 scripts/update-torbox.sh      the repin logic the workflow calls
+scripts/update-maintainerr.sh  the repin logic the workflow calls
 .tools/lint-apps.mjs          vendored Umbrel linter
 ```

@@ -1,0 +1,68 @@
+name: Update Maintainerr
+
+# Keeps the packaged Maintainerr pinned to upstream's newest release, so the app
+# store does not need manual upkeep when Maintainerr ships. Without it the
+# package would stay on whichever version it was written against.
+#
+# Deliberately not triggered by push: the job commits to this repository, and a
+# push trigger would make it re-run against its own commit.
+
+on:
+  schedule:
+    # Upstream releases every week or two, so a daily check is enough. The
+    # offset avoids the top-of-hour rush on GitHub's scheduler and keeps it away
+    # from the Silo and TorBox jobs.
+    - cron: "13 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-maintainerr
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Repin Maintainerr and commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install lint dependencies
+        run: npm install --no-audit --no-fund
+
+      # The update script reads the latest release from the GitHub API and
+      # resolves the image with `docker buildx imagetools inspect`, which the
+      # ubuntu-latest runner already has, so no extra tooling is needed.
+      - name: Repin to the newest upstream release
+        env:
+          # Only used to raise the GitHub API rate limit when reading upstream's
+          # latest release. The image digests come from the registry.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/update-maintainerr.sh
+
+      - name: Lint the package before committing
+        run: npm run lint:apps -- pasithea-maintainerr --check-images
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          # Scope the commit to the app package; the repin script only ever
+          # writes those two files.
+          if git diff --quiet -- pasithea-maintainerr; then
+            echo "Nothing to commit - the package is already current."
+            exit 0
+          fi
+          version="$(sed -nE 's/^version: *"?([^"]*)"? *$/\1/p' pasithea-maintainerr/umbrel-app.yml | head -1)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pasithea-maintainerr
+          git commit -m "chore(maintainerr): update package to ${version}"
+          git push
