@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: ai
 name: Murmur (Pasithea)
-version: "f583b92"
+version: "1e32d9d"
 tagline: Murmur with more than one conversation in a group
 description: >-
   Murmur is a calm, beautiful home for your Hermes agents: make a few agents,
@@ -30,7 +30,7 @@ description: >-
   instead, so your agents and chats stay where they are. Installing both this
   and the official Murmur is possible; they keep their own data and do not
   share a login.
-releaseNotes: "Pasithea's Murmur updated to fork commit f583b92. Full changes: https://github.com/Pasithea0/murmur/compare/dd8e774283ed4c27f8f31cac0322ba6f48684546...f583b929b6bf6ca78a0fe43df3092945346a17be"
+releaseNotes: "Pasithea's Murmur updated to fork commit 1e32d9d. Full changes: https://github.com/Pasithea0/murmur/compare/f583b929b6bf6ca78a0fe43df3092945346a17be...1e32d9d524aaadad97afea9248bdf96e3d311aa8"
 developer: Pasithea
 website: https://github.com/Pasithea0/murmur
 dependencies: []
