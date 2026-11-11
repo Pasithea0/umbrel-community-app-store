@@ -18,7 +18,7 @@ folderAccess:
         readOnly: true
 category: media
 name: Silo
-version: "51b1e0a"
+version: "4a9e527"
 tagline: Self-hosted media streaming server
 description: >-
   Silo is a self-hosted media streaming server. Point it at your movies and
@@ -58,7 +58,7 @@ path: ""
 icon: https://siloserver.org/web-app-icon-512.png
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Silo updated to upstream commit 51b1e0a. Full changes: https://github.com/Silo-Server/silo-server/compare/4018816daab0a6123feb3520fbd2cc8cd7ae1fdf...51b1e0a4065bac6cc116a1fe8efebccbbbc14523"
+releaseNotes: "Silo updated to upstream commit 4a9e527. Full changes: https://github.com/Silo-Server/silo-server/compare/51b1e0a4065bac6cc116a1fe8efebccbbbc14523...4a9e527a432e8ef3a15dcd568802a45c15169039"
 permissions:
   - STORAGE_DOWNLOADS
 submitter: Pasithea0
