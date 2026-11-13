@@ -14,7 +14,7 @@ services:
     # Upstream publishes no releases: `latest` and per-commit tags are built from
     # main. This tag is the full commit SHA the image was built from, so the
     # pinned image is traceable. scripts/update-silo.sh keeps it current.
-    image: ghcr.io/silo-server/silo-server:0b579aa6192d49d7e8e0921dde5e955ac29ce302@sha256:0a76ab3481667ef2ddd06e26fb40412fabbc7006bad99bfdbb51300ba34800dd
+    image: ghcr.io/silo-server/silo-server:0387303d96618a9b8bda44333a6c2e60de37a6fb@sha256:89606a79f9f1a8babbc7b3a4a0593e1f4c052b4274daf8421597680f568c230c
     restart: on-failure
     # On stop Silo fails readiness, keeps serving for SILO_SHUTDOWN_DELAY (5s by
     # default), then finishes in-flight requests. Docker's default 10s stop
@@ -66,7 +66,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: pgvector/pgvector:pg18@sha256:c29f30688a9ad961691bdf0ec1650717cc132a5814619d80f80463d6e4c42e47
+    image: pgvector/pgvector:pg18@sha256:38681dc6eaf55308e2a4c6de392d131652dcfac70e1263e35cd9b5ea3fe39782
     restart: on-failure
     shm_size: 8gb
     environment:
